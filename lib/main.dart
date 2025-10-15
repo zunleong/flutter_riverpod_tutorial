@@ -3,37 +3,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_files/screens/home/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 
-// Only works on mobile
+// ✅ Define top-level background handler
 // Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 //   print('💬 Handling a background message: ${message.messageId}');
 // }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  // ✅ Register background handler (only on mobile, not web)
   // if (!kIsWeb) {
   //   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // }
 
-  final messaging = FirebaseMessaging.instance;
-  await messaging.requestPermission();
+  // final messaging = FirebaseMessaging.instance;
 
-  final token = await messaging.getToken();
-  print('🔥 FCM Token: $token');
+  // ✅ Request permissions (iOS requires this)
+  // await messaging.requestPermission(
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // );
 
-  FirebaseMessaging.onMessage.listen((message) {
-    print('📩 Foreground message: ${message.notification?.title}');
-    print('📜 Body: ${message.notification?.body}');
-  });
+  // ✅ Retrieve and log FCM token
+  // final token = await messaging.getToken();
+  // print('🔥 FCM Token: $token');
 
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    print('🚀 Notification opened: ${message.notification?.title}');
-  });
+  // ✅ Foreground message listener
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   print('📩 Foreground message: ${message.notification?.title}');
+  //   print('📜 Body: ${message.notification?.body}');
+  // });
+
+  // ✅ When app opened from terminated/background
+  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  //   print('🚀 Notification opened: ${message.notification?.title}');
+  // });
 
   runApp(const ProviderScope(child: MyApp()));
 }
