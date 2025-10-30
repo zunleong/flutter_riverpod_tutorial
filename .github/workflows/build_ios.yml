@@ -2,6 +2,9 @@ name: Build iOS Flutter App
 
 on:
   workflow_dispatch:   # allows manual run
+  push:
+    branches:
+      - develop  
 
 jobs:
   build:
