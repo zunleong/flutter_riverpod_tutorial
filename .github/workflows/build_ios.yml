@@ -36,11 +36,18 @@ jobs:
 
       # 🧱 Fallback: if no IPA, zip the .app manually
       - name: Package .app if .ipa missing
-          if [ -f build/ios/ipa/Runner.ipa ]; then
         run: |
-          echo "No .ipa found, zipping Runner.app instead..."
-          cd build/ios/iphoneos
-          zip -r Runner.zip Runner.app
+          if [ -f build/ios/ipa/Runner.ipa ]; then
+            echo "✅ .ipa found, no zipping needed."
+          elif [ -d build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app ]; then
+            echo "⚠️ No .ipa found. Zipping Runner.app from archive..."
+            cd build/ios/archive/Runner.xcarchive/Products/Applications
+            zip -r Runner.zip Runner.app
+            mv Runner.zip ../../../../
+          else
+            echo "❌ No .app found to zip!"
+            exit 1
+          fi
 
       # 📦 Upload either .ipa or .zip artifact
       - name: Upload iOS build artifact
