@@ -1,10 +1,10 @@
 name: Build iOS Flutter App
 
 on:
-  workflow_dispatch:   # allows manual run
+  workflow_dispatch:
   push:
     branches:
-      - develop  
+      - develop
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -26,7 +26,7 @@ jobs:
         run: flutter build ipa --release --no-codesign
 
       - name: Upload artifact (.ipa)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ios_build
           path: build/ios/ipa/
