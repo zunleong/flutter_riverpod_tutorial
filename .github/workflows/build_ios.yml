@@ -17,16 +17,36 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.4"
+          flutter-version: "3.35.4"   # Flutter 3.35.x includes Dart 3.6+
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build iOS app
-        run: flutter build ipa --release --no-codesign
+      # 🧱 Try to build an unsigned .ipa (Flutter 3.16+)
+      - name: Build iOS IPA (unsigned)
+        id: build_ipa
+        run: |
+          set -e
+          echo "Attempting to build unsigned IPA..."
+          flutter build ipa --release --no-codesign || echo "IPA build failed, will try .app fallback."
 
-      - name: Upload artifact (.ipa)
+      # 🧩 List build outputs (for debug)
+      - name: List build directory
+        run: ls -R build/ios || true
+
+      # 🧱 Fallback: if no IPA, zip the .app manually
+      - name: Package .app if .ipa missing
+          if [ -f build/ios/ipa/Runner.ipa ]; then
+        run: |
+          echo "No .ipa found, zipping Runner.app instead..."
+          cd build/ios/iphoneos
+          zip -r Runner.zip Runner.app
+
+      # 📦 Upload either .ipa or .zip artifact
+      - name: Upload iOS build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios_build
-          path: build/ios/ipa/
+          path: |
+            build/ios/ipa/*.ipa
+            build/ios/iphoneos/Runner.zip
